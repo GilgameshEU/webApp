@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
-import React, { useEffect, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import Axios from "axios";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -46,12 +46,24 @@ function App() {
   }, []);
 
   return (
+    // <section class="vh-100 gradient-custom">
+    //   <div class="container py-5 h-100">
+    //     <div class="row d-flex justify-content-center align-items-center h-100">
+    //       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+    //         <div class="card-body p-5 text-center">
+    //           <div class="mb-md-5 mt-md-4 pb-5">
     <div className="App">
-      <div className="registration">
-        <h1>Registration</h1>
-        <label>Username</label>
+      <h1>Current user: {loginStatus}</h1>
+
+      <div className="registration" class="form-outline form-white mb-4">
+        <h2>Registration</h2>
+        <label class="label label-primary" for="inputypePasswordX">
+          Username
+        </label>
         <input
           type="text"
+          class="form-control form-control-lg"
+          id="typePasswordX"
           onChange={(e) => {
             setUsernameReg(e.target.value);
           }}
@@ -63,7 +75,6 @@ function App() {
             setPasswordReg(e.target.value);
           }}
         />
-
         <label>Mail</label>
         <input
           type="text"
@@ -71,7 +82,6 @@ function App() {
             setMailReg(e.target.value);
           }}
         />
-
         <button onClick={register} className="btn btn-primary">
           Register
         </button>
@@ -96,14 +106,31 @@ function App() {
           Login
         </button>
       </div>
-      <h1>{loginStatus}</h1>
+      <div>
+        <button
+          onClick={() => {
+            window.location.href = "http://localhost:3001/users/user-list";
+          }}
+          className="btn btn-primary"
+        >
+          user-list
+        </button>
+        <button>delete</button>
+      </div>
+
       <iframe
         src="http://localhost:3001/users/user-list"
         width="100%"
         height="1200px"
-        name="users"
+        id="iframeUsers"
       ></iframe>
     </div>
+    // </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </section>
   );
 }
 

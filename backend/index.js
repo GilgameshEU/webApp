@@ -12,13 +12,16 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
-//const now = new Date();
+const moment = require("moment");
 
 const app = express();
 
 const usersRouter = require("./routes/users");
 
 const path = require("path");
+const now = moment().format("DD/MM/YYYY HH:mm:ss A");
+
+const router = express.Router();
 
 //app.set('views', './views');
 app.set("views", path.join(__dirname, "views"));
@@ -44,21 +47,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   session({
     key: "userId",
-    secret: "subscribe",
+    secret: "userLogin",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      expires: 60 * 60 * 24,
+      expires: 24 * 60 * 60 * 1000,
     },
   })
 );
-
-// const db=mysql.createConnection({
-//     user:"root",
-//     host:"localhost",
-//     password:"root",
-//     database:"main_db",
-// });
 
 app.post("/register", (req, res) => {
   const username = req.body.username;
@@ -70,8 +66,8 @@ app.post("/register", (req, res) => {
       console.log(err);
     }
     db.query(
-      "INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,CURRENT_DATE())",
-      [username, hash, mail],
+      "INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,?)",
+      [username, hash, mail, now],
       (err, result) => {
         console.log(err);
       }
@@ -107,15 +103,14 @@ app.post("/login", (req, res) => {
             res.send({ message: "Wrong username/password combination!" });
           }
         });
-        //  res.send(result);
       } else {
         res.send({ message: "User doesn't exist" });
       }
     }
   );
   db.query(
-    "UPDATE users SET lastLogin=NOW() WHERE username = ?;",
-    username,
+    "UPDATE users SET lastLogin=? WHERE username = ?;",
+    [now, username],
     (err, result) => {
       console.log(err);
     }
