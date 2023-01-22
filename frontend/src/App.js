@@ -33,7 +33,9 @@ function App() {
       password: passwordReg,
       mail: mailReg,
     }).then((response) => {
-      console.log(response);
+      if (response.data.message) {
+        setLoginStatus(response.data.message);
+      }
     });
   };
 
@@ -53,16 +55,16 @@ function App() {
     //         <div class="card-body p-5 text-center">
     //           <div class="mb-md-5 mt-md-4 pb-5">
     <div className="App">
-      <h1>Current user: {loginStatus}</h1>
-
-      <div className="registration" class="form-outline form-white mb-4">
+      <h1>{loginStatus}</h1>
+      <div className="registration">
         <h2>Registration</h2>
-        <label class="label label-primary" for="inputypePasswordX">
+        <label
+          className="label label-primary"
+          htmlFor="inputypePasswordX">
           Username
         </label>
         <input
           type="text"
-          class="form-control form-control-lg"
           id="typePasswordX"
           onChange={(e) => {
             setUsernameReg(e.target.value);
@@ -82,7 +84,9 @@ function App() {
             setMailReg(e.target.value);
           }}
         />
-        <button onClick={register} className="btn btn-primary">
+        <button
+          onClick={register}
+          className="btn btn-primary">
           Register
         </button>
       </div>
@@ -102,7 +106,9 @@ function App() {
             setPassword(e.target.value);
           }}
         />
-        <button onClick={login} className="btn btn-primary">
+        <button
+          onClick={login}
+          className="btn btn-primary">
           Login
         </button>
       </div>
@@ -111,19 +117,16 @@ function App() {
           onClick={() => {
             window.location.href = "http://localhost:3001/users/user-list";
           }}
-          className="btn btn-primary"
-        >
+          className="btn btn-primary">
           user-list
         </button>
-        <button>delete</button>
       </div>
 
       <iframe
         src="http://localhost:3001/users/user-list"
         width="100%"
         height="1200px"
-        id="iframeUsers"
-      ></iframe>
+        id="iframeUsers"></iframe>
     </div>
     // </div>
     //         </div>

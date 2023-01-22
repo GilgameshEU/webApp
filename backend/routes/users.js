@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/database");
-// another routes also appear here
-// this script to fetch data from MySQL databse table
+const urlencodedParser = express.urlencoded({ extended: false });
 
 router.get("/user-list", function (req, res, next) {
   const sql = "SELECT * FROM users";
@@ -12,10 +11,14 @@ router.get("/user-list", function (req, res, next) {
   });
 });
 
-//solo del with id
-router.get("/delete/:id", function (request, res, next) {
-  var id = request.params.id;
-  const sql = `DELETE FROM users WHERE id = "${id}" `;
+router.post("/groupDelete", urlencodedParser, function (request, res, next) {
+  let groupIds = request.body.childChb;
+  let sql = "";
+  if (typeof groupIds === "string") {
+    sql = `DELETE FROM users WHERE id = ${groupIds} `;
+  } else {
+    sql = `DELETE FROM users WHERE id IN (${groupIds.join(",")}) `;
+  }
   db.query(sql, function (err, data) {
     if (err) {
       throw err;
@@ -25,11 +28,32 @@ router.get("/delete/:id", function (request, res, next) {
   });
 });
 
-//group del
-router.post("/groupDelete", function (request, res, next) {
-  var groupIds = request.body.shouldDelete;
-  console.log(request.body.shouldDelete);
-  const sql = `DELETE FROM users WHERE id IN "${groupIds.join(",")}" `;
+router.post("/groupBlock", urlencodedParser, function (request, res, next) {
+  let groupIds = request.body.childChb;
+  console.log(typeof groupIds);
+  let sql = "";
+  if (typeof groupIds === "string") {
+    sql = `UPDATE users SET status=1 WHERE id = ${groupIds} `;
+  } else {
+    sql = `UPDATE users SET status=1 WHERE id IN (${groupIds.join(",")}) `;
+  }
+  db.query(sql, function (err, data) {
+    if (err) {
+      throw err;
+    } else {
+      res.redirect("/users/user-list");
+    }
+  });
+});
+
+router.post("/groupUnblock", urlencodedParser, function (request, res, next) {
+  let groupIds = request.body.childChb;
+  let sql = "";
+  if (typeof groupIds === "string") {
+    sql = `UPDATE users SET status=0 WHERE id = ${groupIds} `;
+  } else {
+    sql = `UPDATE users SET status=0 WHERE id IN (${groupIds.join(",")}) `;
+  }
   db.query(sql, function (err, data) {
     if (err) {
       throw err;

@@ -13,13 +13,13 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 const moment = require("moment");
+const now = moment().format("DD/MM/YYYY HH:mm:ss A");
 
 const app = express();
 
 const usersRouter = require("./routes/users");
 
 const path = require("path");
-const now = moment().format("DD/MM/YYYY HH:mm:ss A");
 
 const router = express.Router();
 
@@ -42,7 +42,8 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.json()); //delete
 
 app.use(
   session({
@@ -59,19 +60,32 @@ app.use(
 app.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-  const mail = req.body.username;
-
-  bcrypt.hash(password, saltRounds, (err, hash) => {
+  const mail = req.body.mail;
+  db.query("SELECT COUNT(*) as count FROM users WHERE username = ? OR mail = ?", [username, mail], (err, result) => {
     if (err) {
       console.log(err);
-    }
-    db.query(
-      "INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,?)",
-      [username, hash, mail, now],
-      (err, result) => {
-        console.log(err);
+      res.status(500).send("Error checking user");
+    } else {
+      if (result[0].count != 0) {
+        res.send({ message: "User already exist" });
+      } else {
+        bcrypt.hash(password, saltRounds, (err, hash) => {
+          if (err) {
+            console.log(err);
+            res.send({ message: "Error hashing password" });
+          } else {
+            db.query("INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,?)", [username, hash, mail, now], (err, result) => {
+              if (err) {
+                console.log(err);
+                res.send({ message: "Error creating user" });
+              } else {
+                res.send({ message: "User created" });
+              }
+            });
+          }
+        });
       }
-    );
+    }
   });
 });
 
@@ -86,41 +100,29 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-  db.query(
-    "SELECT * FROM users WHERE username = ?;",
-    username,
-    (err, result) => {
-      if (err) {
-        res.send({ err: err });
-      }
-      if (result.length > 0) {
-        bcrypt.compare(password, result[0].password, (error, response) => {
-          if (response) {
-            req.session.user = result;
-            console.log(req.session.user);
-            res.send(result);
-          } else {
-            res.send({ message: "Wrong username/password combination!" });
-          }
-        });
-      } else {
-        res.send({ message: "User doesn't exist" });
-      }
+  db.query("SELECT * FROM users WHERE username = ?;", username, (err, result) => {
+    if (err) {
+      res.send({ err: err });
     }
-  );
-  db.query(
-    "UPDATE users SET lastLogin=? WHERE username = ?;",
-    [now, username],
-    (err, result) => {
-      console.log(err);
+    if (result.length > 0) {
+      bcrypt.compare(password, result[0].password, (error, response) => {
+        if (response) {
+          req.session.user = result;
+          // console.log(req.session.user);
+          res.send(result);
+        } else {
+          res.send({ message: "Wrong username/password combination!" });
+        }
+      });
+    } else {
+      res.send({ message: "User doesn't exist" });
     }
-  );
+  });
+  db.query("UPDATE users SET lastLogin=? WHERE username = ?;", [now, username], (err, result) => {
+    console.log(err);
+  });
 });
 
 app.listen(port, function () {
   console.log("Server is running on port: " + port);
 });
-// simple route
-//app.get("/", (req, res) => {
-//    res.json({ message: "Welcome to my application." });
-//  });

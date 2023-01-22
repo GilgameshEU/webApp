@@ -4,78 +4,96 @@
     <title>Users</title>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1" />
 
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
+      crossorigin="anonymous" />
     <script type="text/javascript">
       function checkUncheck(checkBox) {
-        get = document.getElementsByName("childCb");
+        get = document.getElementsByName("childChb");
         for (var i = 0; i < get.length; i++) {
           get[i].checked = checkBox.checked;
         }
       }
-      //function checkedChb()
-      let arr = [25, 26];
+
+      // function getCookie(name) {
+      //   var value = "; " + document.cookie;
+      //   var parts = value.split("; " + name + "=");
+      //   if (parts.length == 2) return parts.pop().split(";").shift();
+      // }
+
+      // var user = getCookie("user");
+      // if (user) {
+      //   console.log("User found in cookies: " + user);
+      // } else {
+      //   console.log("User not found in cookies.");
+      // }
     </script>
   </head>
   <body>
-    <form action="/users/groupDelete" method="POST">
-      <input type="checkbox" name="shouldDelete" id="28" for="row1" />
-      <input type="checkbox" name="shouldDelete" id="29" for="row2" />
-      <input type="checkbox" name="shouldDelete" id="30" for="row3" />
-      <button type="submit">Send</button>
+    <form method="POST">
+      <div class="table-data">
+        <button
+          type="submit"
+          formaction="/users/groupDelete"
+          class="btn btn-danger btn-sm">
+          Delete
+        </button>
+        <button
+          type="submit"
+          formaction="/users/groupUnblock"
+          class="btn btn-danger btn-sm">
+          Unblock
+        </button>
+        <button
+          type="submit"
+          formaction="/users/groupBlock"
+          class="btn btn-danger btn-sm">
+          Block
+        </button>
+        <h2>Display Users list</h2>
+        <table class="table table-bordered">
+          <tr>
+            <th>
+              Select all<input
+                type="checkbox"
+                name="mainCb"
+                onchange="checkUncheck(this)"
+                unchecked />
+            </th>
+            <th>username</th>
+            <th>mail</th>
+            <th>createdAt</th>
+            <th>lastLogin</th>
+            <th>status</th>
+          </tr>
+          <% if(userData.length!=0){ var i=1; userData.forEach(function(data){ %>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                value="<%=data.id%>"
+                name="childChb" />
+            </td>
+            <td><%=data.username %></td>
+            <td><%=data.mail %></td>
+            <td><%=data.createdAt %></td>
+            <td><%=data.lastLogin %></td>
+            <td><%=data.status %></td>
+          </tr>
+          <% i++; }) %> <% } else{ %>
+          <tr>
+            <td colspan="6">No Data Found</td>
+          </tr>
+          <% } %>
+        </table>
+      </div>
     </form>
-
-    <div class="table-data">
-      <a href="/users/delete/27" class="btn btn-danger btn-sm">Delete</a>
-      <h2>Display Users list</h2>
-      <table class="table table-bordered">
-        <tr>
-          <th>
-            Select all<input
-              type="checkbox"
-              name="mainCb"
-              onchange="checkUncheck(this)"
-              unchecked
-            />
-          </th>
-          <!-- <th>id</th> -->
-          <th>username</th>
-          <th>mail</th>
-          <th>createdAt</th>
-          <th>lastLogin</th>
-          <th>status</th>
-          <th>1</th>
-          <th>2</th>
-        </tr>
-
-        <% if(userData.length!=0){ var i=1; userData.forEach(function(data){ %>
-        <tr>
-          <td>
-            <input type="checkbox" id="<%=data.id%>" name="childCb" unchecked />
-          </td>
-          <!-- <td><%=data.id %></td> -->
-          <td><%=data.username %></td>
-          <td><%=data.mail %></td>
-          <td><%=data.createdAt %></td>
-          <td><%=data.lastLogin %></td>
-          <td><%=data.status %></td>
-
-          <td><a href="/users/edit/<%=data.id%>">Edit</a></td>
-          <td><a href="/users/delete/<%=data.id%>">Delete</a></td>
-        </tr>
-        <% i++; }) %> <% } else{ %>
-        <tr>
-          <td colspan="6">No Data Found</td>
-        </tr>
-        <% } %>
-      </table>
-    </div>
   </body>
 </html>
