@@ -12,6 +12,8 @@ function App() {
   const [password, setPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState("");
 
+  const [currentUser, setCurrentUser] = useState();
+
   Axios.defaults.withCredentials = true;
 
   const login = () => {
@@ -39,10 +41,21 @@ function App() {
     });
   };
 
+  // useEffect(() => {
+  //   Axios.get("http://localhost:3001/login").then((response) => {
+  //     if (response.data.loggedIn === true) {
+  //       setLoginStatus(response.data.user[0].username);
+  //     }
+  //   });
+  // }, []);
+
   useEffect(() => {
-    Axios.get("http://localhost:3001/login").then((response) => {
-      if (response.data.loggedIn === true) {
-        setLoginStatus(response.data.user[0].username);
+    const allCookies = document.cookie;
+    const cookieArray = allCookies.split(";");
+    cookieArray.forEach((cookie) => {
+      const [name, value] = cookie.split("=");
+      if (name === "currentUser") {
+        setCurrentUser(value);
       }
     });
   }, []);
@@ -54,10 +67,12 @@ function App() {
     //       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
     //         <div class="card-body p-5 text-center">
     //           <div class="mb-md-5 mt-md-4 pb-5">
+
     <div className="App">
       <h1>{loginStatus}</h1>
       <div className="registration">
         <h2>Registration</h2>
+        <h3>{currentUser}</h3>
         <label
           className="label label-primary"
           htmlFor="inputypePasswordX">
