@@ -11,8 +11,7 @@ function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState("");
-
-  const [currentUser, setCurrentUser] = useState();
+  const [logoutStatus, setLogoutStatus] = useState("");
 
   Axios.defaults.withCredentials = true;
 
@@ -25,6 +24,7 @@ function App() {
         setLoginStatus(response.data.message);
       } else {
         setLoginStatus(response.data[0].username);
+        window.location.reload();
       }
     });
   };
@@ -37,28 +37,40 @@ function App() {
     }).then((response) => {
       if (response.data.message) {
         setLoginStatus(response.data.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     });
   };
 
-  // useEffect(() => {
-  //   Axios.get("http://localhost:3001/login").then((response) => {
-  //     if (response.data.loggedIn === true) {
-  //       setLoginStatus(response.data.user[0].username);
-  //     }
-  //   });
-  // }, []);
+  const logout = () => {
+    Axios.post("http://localhost:3001/logout", {
+      username: username,
+    }).then((response) => {
+      if (response.data.message) {
+        setLogoutStatus(response.data.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setLogoutStatus("Successfully logged out");
+        sessionStorage.removeItem("userId");
+      }
+    });
+  };
 
   useEffect(() => {
-    const allCookies = document.cookie;
-    const cookieArray = allCookies.split(";");
-    cookieArray.forEach((cookie) => {
-      const [name, value] = cookie.split("=");
-      if (name === "currentUser") {
-        setCurrentUser(value);
+    Axios.get("http://localhost:3001/login").then((response) => {
+      if (response.data.loggedIn === true) {
+        setLoginStatus(response.data.user[0].username);
       }
     });
   }, []);
+
+  module.exports = {
+    logout: logout,
+  };
 
   return (
     // <section class="vh-100 gradient-custom">
@@ -69,10 +81,11 @@ function App() {
     //           <div class="mb-md-5 mt-md-4 pb-5">
 
     <div className="App">
-      <h1>{loginStatus}</h1>
+      <h1>
+        {loginStatus} {logoutStatus}
+      </h1>
       <div className="registration">
         <h2>Registration</h2>
-        <h3>{currentUser}</h3>
         <label
           className="label label-primary"
           htmlFor="inputypePasswordX">
@@ -125,6 +138,11 @@ function App() {
           onClick={login}
           className="btn btn-primary">
           Login
+        </button>
+        <button
+          onClick={logout}
+          className="btn btn-primary">
+          Exit
         </button>
       </div>
       <div>

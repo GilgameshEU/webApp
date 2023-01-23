@@ -24,14 +24,13 @@
     </script>
   </head>
   <body>
-    <p>Login status: <%= loginStatus %></p>
     <form method="POST">
       <div class="table-data">
         <button
           type="submit"
-          formaction="/users/groupDelete"
+          formaction="/users/groupBlock"
           class="btn btn-danger btn-sm">
-          Delete
+          Block
         </button>
         <button
           type="submit"
@@ -41,9 +40,9 @@
         </button>
         <button
           type="submit"
-          formaction="/users/groupBlock"
+          formaction="/users/groupDelete"
           class="btn btn-danger btn-sm">
-          Block
+          Delete
         </button>
         <h2>Display Users list</h2>
         <table class="table table-bordered">

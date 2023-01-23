@@ -1,37 +1,25 @@
 const express = require("express");
-//const mysql=require("mysql2")
 const db = require("./config/database.js");
 const cors = require("cors");
 const port = process.env.PORT || 3001;
 const { response } = require("express");
-
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-
 const moment = require("moment");
 const now = moment().format("DD/MM/YYYY HH:mm:ss A");
-
 const app = express();
-
 const usersRouter = require("./routes/users");
-
 const path = require("path");
-
 const router = express.Router();
-
-//app.set('views', './views');
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-
 app.use(express.json());
-//app.use(cors());
-
-//app.use('/', nodeRoutes)
 app.use("/users", usersRouter);
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(
   cors({
@@ -40,9 +28,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(
   session({
@@ -63,7 +48,7 @@ app.post("/register", (req, res) => {
   db.query("SELECT COUNT(*) as count FROM users WHERE username = ? OR mail = ?", [username, mail], (err, result) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error checking user");
+      res.send({ message: "Error checking user" });
     } else {
       if (result[0].count != 0) {
         res.send({ message: "User already exist" });
@@ -99,26 +84,48 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+  let loginIn = true;
   db.query("SELECT * FROM users WHERE username = ?;", username, (err, result) => {
     if (err) {
       res.send({ err: err });
     }
     if (result.length > 0) {
-      bcrypt.compare(password, result[0].password, (error, response) => {
-        if (response) {
-          req.session.user = result;
-          // console.log(req.session.user);
-          res.send(result);
-        } else {
-          res.send({ message: "Wrong username/password combination!" });
-        }
-      });
+      if (result[0].status === 1) {
+        res.send({ message: "User is blocked, contact the administrator!" });
+      } else {
+        bcrypt.compare(password, result[0].password, (error, response) => {
+          if (response) {
+            req.session.user = result;
+            res.send(result);
+          } else {
+            res.send({ message: "Wrong username/password combination!" });
+          }
+        });
+      }
     } else {
       res.send({ message: "User doesn't exist" });
     }
   });
-  db.query("UPDATE users SET lastLogin=? WHERE username = ?;", [now, username], (err, result) => {
+  db.query("UPDATE users SET loginIn=false WHERE username != ?;", username, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+  db.query("UPDATE users SET lastLogin=?,loginIn=? WHERE username = ?;", [now, loginIn, username], (err, result) => {
     console.log(err);
+  });
+});
+
+app.post("/logout", (req, res) => {
+  const username = req.session.user[0].username;
+  let loginIn = false;
+  db.query("UPDATE users SET loginIn=? WHERE username = ?;", [loginIn, username], (err, result) => {
+    if (err) {
+      res.send({ err: err });
+    } else {
+      req.session.destroy();
+      res.send({ message: "Successfully logged out" });
+    }
   });
 });
 
