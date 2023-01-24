@@ -14,6 +14,9 @@
       rel="stylesheet"
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script type="text/javascript">
       function checkUncheck(checkBox) {
         get = document.getElementsByName("childChb");
@@ -29,56 +32,61 @@
         <button
           type="submit"
           formaction="/users/groupBlock"
-          class="btn btn-danger btn-sm">
+          class="btn btn-danger btn-sm px-5 py-2">
           Block
         </button>
         <button
           type="submit"
           formaction="/users/groupUnblock"
-          class="btn btn-danger btn-sm">
-          Unblock
+          class="btn btn-success btn-sm">
+          <i class="fas fa-check-circle fa-1g"></i>
         </button>
         <button
           type="submit"
           formaction="/users/groupDelete"
           class="btn btn-danger btn-sm">
-          Delete
+          <i class="fas fa-trash fa-lg"></i>
         </button>
-        <h2>Display Users list</h2>
-        <table class="table table-bordered">
-          <tr>
-            <th>
-              Select all<input
-                type="checkbox"
-                name="mainCb"
-                onchange="checkUncheck(this)"
-                unchecked />
-            </th>
-            <th>username</th>
-            <th>mail</th>
-            <th>createdAt</th>
-            <th>lastLogin</th>
-            <th>status</th>
-          </tr>
-          <% if(userData.length!=0){ var i=1; userData.forEach(function(data){ %>
-          <tr>
-            <td>
-              <input
-                type="checkbox"
-                value="<%=data.id%>"
-                name="childChb" />
-            </td>
-            <td><%=data.username %></td>
-            <td><%=data.mail %></td>
-            <td><%=data.createdAt %></td>
-            <td><%=data.lastLogin %></td>
-            <td><%=data.status %></td>
-          </tr>
-          <% i++; }) %> <% } else{ %>
-          <tr>
-            <td colspan="6">No Data Found</td>
-          </tr>
-          <% } %>
+
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th class="text-center">
+                select all/none
+                <input
+                  type="checkbox"
+                  name="mainCb"
+                  onchange="checkUncheck(this)"
+                  unchecked />
+              </th>
+              <th class="text-center">username</th>
+              <th class="text-center">mail</th>
+              <th class="text-center">createdAt</th>
+              <th class="text-center">lastLogin</th>
+              <th class="text-center">status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if(userData.length!=0){ var i=1; userData.forEach(function(data){ %>
+            <tr>
+              <td>
+                <input
+                  type="checkbox"
+                  value="<%=data.id%>"
+                  name="childChb" />
+              </td>
+              <td><%=data.username %></td>
+              <td><%=data.mail %></td>
+              <td><%=data.createdAt %></td>
+              <td><%=data.lastLogin %></td>
+              <td><%= data.status === 1 ? 'blocked' : 'active' %></td>
+            </tr>
+            <% i++; }) %> <% } else{ %>
+            <tr>
+              <td colspan="6">No Data Found</td>
+            </tr>
+            <% } %>
+          </tbody>
         </table>
       </div>
     </form>

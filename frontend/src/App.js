@@ -73,10 +73,14 @@ function App() {
     <div className="App container">
       <div className="row">
         <div className="col-md-6">
-          <h2 className="text-center">Registration</h2>
+          <h2 className="text-center text-primary">Registration</h2>
           <form>
             <div className="form-group">
-              <label htmlFor="inputUsername">Username</label>
+              <label
+                htmlFor="inputUsername"
+                className="text-secondary">
+                Username
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -87,7 +91,11 @@ function App() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="inputPassword">Password</label>
+              <label
+                htmlFor="inputPassword"
+                className="text-secondary">
+                Password
+              </label>
               <input
                 type="password"
                 className="form-control"
@@ -98,7 +106,11 @@ function App() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="inputMail">Mail</label>
+              <label
+                htmlFor="inputMail"
+                className="text-secondary">
+                Mail
+              </label>
               <input
                 type="email"
                 className="form-control"
@@ -141,7 +153,6 @@ function App() {
               />
             </div>
           </form>
-
           <button
             className="btn btn-primary mr-2"
             onClick={login}>
