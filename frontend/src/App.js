@@ -2,7 +2,7 @@
 import React, { Component, useEffect, useState } from "react";
 import Axios from "axios";
 import "./App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
   const [usernameReg, setUsernameReg] = useState("");
@@ -55,118 +55,114 @@ function App() {
         }, 1000);
       } else {
         setLogoutStatus("Successfully logged out");
-        sessionStorage.removeItem("userId");
       }
     });
   };
 
   useEffect(() => {
     Axios.get("http://localhost:3001/login").then((response) => {
-      if (response.data.loggedIn === true) {
+      if (response.data.loggedIn !== 0) {
         setLoginStatus(response.data.user[0].username);
+      } else {
+        setLoginStatus("");
       }
     });
   }, []);
 
-  module.exports = {
-    logout: logout,
-  };
-
   return (
-    // <section class="vh-100 gradient-custom">
-    //   <div class="container py-5 h-100">
-    //     <div class="row d-flex justify-content-center align-items-center h-100">
-    //       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-    //         <div class="card-body p-5 text-center">
-    //           <div class="mb-md-5 mt-md-4 pb-5">
+    <div className="App container">
+      <div className="row">
+        <div className="col-md-6">
+          <h2 className="text-center">Registration</h2>
+          <form>
+            <div className="form-group">
+              <label htmlFor="inputUsername">Username</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputUsername"
+                onChange={(e) => {
+                  setUsernameReg(e.target.value);
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputPassword">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="inputPassword"
+                onChange={(e) => {
+                  setPasswordReg(e.target.value);
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputMail">Mail</label>
+              <input
+                type="email"
+                className="form-control"
+                id="inputMail"
+                onChange={(e) => {
+                  setMailReg(e.target.value);
+                }}
+              />
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={register}>
+              Register
+            </button>
+          </form>
+        </div>
+        <div className="col-md-6">
+          <h2 className="text-center">Login</h2>
+          <form>
+            <div className="form-group">
+              <label htmlFor="inputUsername">Username</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputUsername"
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputPassword">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="inputPassword"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
+            </div>
+          </form>
 
-    <div className="App">
-      <h1>
+          <button
+            className="btn btn-primary mr-2"
+            onClick={login}>
+            Login
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={logout}>
+            Exit
+          </button>
+        </div>
+      </div>
+      <h1 className="text-center">
         {loginStatus} {logoutStatus}
       </h1>
-      <div className="registration">
-        <h2>Registration</h2>
-        <label
-          className="label label-primary"
-          htmlFor="inputypePasswordX">
-          Username
-        </label>
-        <input
-          type="text"
-          id="typePasswordX"
-          onChange={(e) => {
-            setUsernameReg(e.target.value);
-          }}
-        />
-        <label>Password</label>
-        <input
-          type="text"
-          onChange={(e) => {
-            setPasswordReg(e.target.value);
-          }}
-        />
-        <label>Mail</label>
-        <input
-          type="text"
-          onChange={(e) => {
-            setMailReg(e.target.value);
-          }}
-        />
-        <button
-          onClick={register}
-          className="btn btn-primary">
-          Register
-        </button>
-      </div>
-      <div className="login">
-        <h1>Login</h1>
-        <input
-          type="text"
-          placeholder="Username..."
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
-        />
-        <input
-          type="password"
-          placeholder="Password..."
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-        <button
-          onClick={login}
-          className="btn btn-primary">
-          Login
-        </button>
-        <button
-          onClick={logout}
-          className="btn btn-primary">
-          Exit
-        </button>
-      </div>
-      <div>
-        <button
-          onClick={() => {
-            window.location.href = "http://localhost:3001/users/user-list";
-          }}
-          className="btn btn-primary">
-          user-list
-        </button>
-      </div>
-
       <iframe
         src="http://localhost:3001/users/user-list"
         width="100%"
         height="1200px"
         id="iframeUsers"></iframe>
     </div>
-    // </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </section>
   );
 }
 

@@ -14,10 +14,11 @@ const app = express();
 const usersRouter = require("./routes/users");
 const path = require("path");
 const router = express.Router();
+app.use("/users", usersRouter);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.json());
-app.use("/users", usersRouter);
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -37,6 +38,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       expires: 24 * 60 * 60 * 1000,
+      //expires: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -45,32 +47,36 @@ app.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   const mail = req.body.mail;
-  db.query("SELECT COUNT(*) as count FROM users WHERE username = ? OR mail = ?", [username, mail], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send({ message: "Error checking user" });
-    } else {
-      if (result[0].count != 0) {
-        res.send({ message: "User already exist" });
+  if (!username || !password || !mail) {
+    res.send({ message: "Please fill in all fields" });
+  } else {
+    db.query("SELECT COUNT(*) as count FROM users WHERE username = ? OR mail = ?", [username, mail], (err, result) => {
+      if (err) {
+        console.log(err);
+        res.send({ message: "Error checking user" });
       } else {
-        bcrypt.hash(password, saltRounds, (err, hash) => {
-          if (err) {
-            console.log(err);
-            res.send({ message: "Error hashing password" });
-          } else {
-            db.query("INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,?)", [username, hash, mail, now], (err, result) => {
-              if (err) {
-                console.log(err);
-                res.send({ message: "Error creating user" });
-              } else {
-                res.send({ message: "User created" });
-              }
-            });
-          }
-        });
+        if (result[0].count != 0) {
+          res.send({ message: "User already exist" });
+        } else {
+          bcrypt.hash(password, saltRounds, (err, hash) => {
+            if (err) {
+              console.log(err);
+              res.send({ message: "Error hashing password" });
+            } else {
+              db.query("INSERT INTO users (username,password,mail,createdAt) VALUES (?,?,?,?)", [username, hash, mail, now], (err, result) => {
+                if (err) {
+                  console.log(err);
+                  res.send({ message: "Error creating user" });
+                } else {
+                  res.send({ message: "User created" });
+                }
+              });
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -84,7 +90,6 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-  let loginIn = true;
   db.query("SELECT * FROM users WHERE username = ?;", username, (err, result) => {
     if (err) {
       res.send({ err: err });
@@ -111,15 +116,14 @@ app.post("/login", (req, res) => {
       console.log(err);
     }
   });
-  db.query("UPDATE users SET lastLogin=?,loginIn=? WHERE username = ?;", [now, loginIn, username], (err, result) => {
+  db.query("UPDATE users SET lastLogin=?,loginIn=true WHERE username = ?;", [now, username], (err, result) => {
     console.log(err);
   });
 });
 
 app.post("/logout", (req, res) => {
   const username = req.session.user[0].username;
-  let loginIn = false;
-  db.query("UPDATE users SET loginIn=? WHERE username = ?;", [loginIn, username], (err, result) => {
+  db.query("UPDATE users SET loginIn=0 WHERE username = ?;", [username], (err, result) => {
     if (err) {
       res.send({ err: err });
     } else {
@@ -132,3 +136,8 @@ app.post("/logout", (req, res) => {
 app.listen(port, function () {
   console.log("Server is running on port: " + port);
 });
+
+// module.exports = {
+//   app,
+//   session,
+// };
