@@ -1,15 +1,24 @@
 const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-  user: process.env.DB_HOST || "root",
-  host: process.env.DB_USER || "localhost",
-  password: process.env.DB_PASS || "root",
-  database: process.env.DB_NAME || "main_db",
+  user: "b78fa8f9e3c13e" || "root",
+  host: "eu-cdbr-west-03.cleardb.net" || "localhost",
+  password: "f00d9efb" || "root",
+  database: "heroku_81fe62284a87611" || "main_db",
 });
+
+// const db = mysql.createConnection({
+//   user: "root",
+//   host: "localhost",
+//   password: "root",
+//   database: "main_db",
+// });
 
 db.connect(function (err) {
   if (err) throw err;
   console.log("Database is connected successfully !");
 });
 
-module.exports = db;
+//b78fa8f9e3c13e:f00d9efb@eu-cdbr-west-03.cleardb.net/heroku_81fe62284a87611?reconnect=true
+
+mysql: module.exports = db;

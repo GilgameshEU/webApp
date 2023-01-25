@@ -22,9 +22,17 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// app.use(
+//   cors({
+//     origin: ["http://localhost:3000"],
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: "https://statuesque-gingersnap-aadaf0.netlify.app",
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -38,7 +46,6 @@ app.use(
     saveUninitialized: false,
     cookie: {
       expires: 24 * 60 * 60 * 1000,
-      //expires: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -102,6 +109,11 @@ app.post("/login", (req, res) => {
           if (response) {
             req.session.user = result;
             res.send(result);
+            db.query("UPDATE users SET lastLogin=?,loginIn=true WHERE username = ?;", [now, username], (err, result) => {
+              if (err) {
+                console.log(err);
+              }
+            });
           } else {
             res.send({ message: "Wrong username/password combination!" });
           }
@@ -116,19 +128,22 @@ app.post("/login", (req, res) => {
       console.log(err);
     }
   });
-  db.query("UPDATE users SET lastLogin=?,loginIn=true WHERE username = ?;", [now, username], (err, result) => {
-    console.log(err);
-  });
 });
 
 app.post("/logout", (req, res) => {
-  const username = req.session.user[0].username;
-  db.query("UPDATE users SET loginIn=0 WHERE username = ?;", [username], (err, result) => {
+  db.query("SELECT username FROM users WHERE loginIn = 1;", (err, result) => {
     if (err) {
       res.send({ err: err });
     } else {
-      req.session.destroy();
-      res.send({ message: "Successfully logged out" });
+      const username = result[0].username;
+      db.query("UPDATE users SET loginIn=0 WHERE username = ?;", [username], (err, result) => {
+        if (err) {
+          res.send({ err: err });
+        } else {
+          req.session.destroy();
+          res.send({ message: "Successfully logged out" });
+        }
+      });
     }
   });
 });
@@ -136,8 +151,3 @@ app.post("/logout", (req, res) => {
 app.listen(port, function () {
   console.log("Server is running on port: " + port);
 });
-
-// module.exports = {
-//   app,
-//   session,
-// };

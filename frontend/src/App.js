@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -14,9 +14,9 @@ function App() {
   const [logoutStatus, setLogoutStatus] = useState("");
 
   Axios.defaults.withCredentials = true;
-
+  //"http://localhost:3001/login"
   const login = () => {
-    Axios.post("http://localhost:3001/login", {
+    Axios.post("https://my-sql-deploy.herokuapp.com/login", {
       username: username,
       password: password,
     }).then((response) => {
@@ -24,13 +24,15 @@ function App() {
         setLoginStatus(response.data.message);
       } else {
         setLoginStatus(response.data[0].username);
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       }
     });
   };
 
   const register = () => {
-    Axios.post("http://localhost:3001/register", {
+    Axios.post("https://my-sql-deploy.herokuapp.com/register", {
       username: usernameReg,
       password: passwordReg,
       mail: mailReg,
@@ -39,20 +41,20 @@ function App() {
         setLoginStatus(response.data.message);
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 2000);
       }
     });
   };
 
   const logout = () => {
-    Axios.post("http://localhost:3001/logout", {
+    Axios.post("https://my-sql-deploy.herokuapp.com/logout", {
       username: username,
     }).then((response) => {
       if (response.data.message) {
         setLogoutStatus(response.data.message);
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 2000);
       } else {
         setLogoutStatus("Successfully logged out");
       }
@@ -60,7 +62,7 @@ function App() {
   };
 
   useEffect(() => {
-    Axios.get("http://localhost:3001/login").then((response) => {
+    Axios.get("https://my-sql-deploy.herokuapp.com/login").then((response) => {
       if (response.data.loggedIn !== 0) {
         setLoginStatus(response.data.user[0].username);
       } else {
@@ -77,14 +79,15 @@ function App() {
           <form>
             <div className="form-group">
               <label
-                htmlFor="inputUsername"
+                htmlFor="username"
                 className="text-secondary">
                 Username
               </label>
               <input
                 type="text"
                 className="form-control"
-                id="inputUsername"
+                name="username"
+                id="username"
                 onChange={(e) => {
                   setUsernameReg(e.target.value);
                 }}
@@ -92,14 +95,15 @@ function App() {
             </div>
             <div className="form-group">
               <label
-                htmlFor="inputPassword"
+                htmlFor="password"
                 className="text-secondary">
                 Password
               </label>
               <input
                 type="password"
                 className="form-control"
-                id="inputPassword"
+                name="password"
+                id="password"
                 onChange={(e) => {
                   setPasswordReg(e.target.value);
                 }}
@@ -107,14 +111,15 @@ function App() {
             </div>
             <div className="form-group">
               <label
-                htmlFor="inputMail"
+                htmlFor="mail"
                 className="text-secondary">
                 Mail
               </label>
               <input
                 type="email"
                 className="form-control"
-                id="inputMail"
+                id="mail"
+                name="mail"
                 onChange={(e) => {
                   setMailReg(e.target.value);
                 }}
@@ -169,7 +174,7 @@ function App() {
         {loginStatus} {logoutStatus}
       </h1>
       <iframe
-        src="http://localhost:3001/users/user-list"
+        src="https://my-sql-deploy.herokuapp.com/users/user-list"
         width="100%"
         height="1200px"
         id="iframeUsers"></iframe>
