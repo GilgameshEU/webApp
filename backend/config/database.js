@@ -1,16 +1,15 @@
-const mysql=require("mysql2")
+const mysql = require("mysql2");
 
+const db = mysql.createConnection({
+  user: process.env.DB_HOST || "root",
+  host: process.env.DB_USER || "localhost",
+  password: process.env.DB_PASS || "root",
+  database: process.env.DB_NAME || "main_db",
+});
 
-const db=mysql.createConnection({
-      user:"root",
-      host:"localhost",
-      password:"root",
-      database:"main_db",
-  });
+db.connect(function (err) {
+  if (err) throw err;
+  console.log("Database is connected successfully !");
+});
 
-  db.connect(function(err) {
-    if (err) throw err;
-    console.log('Database is connected successfully !');
-  });
-
-  module.exports=db;
+module.exports = db;
