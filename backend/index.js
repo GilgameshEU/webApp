@@ -123,11 +123,11 @@ app.post("/login", (req, res) => {
       res.send({ message: "User doesn't exist" });
     }
   });
-  db.query("UPDATE users SET loginIn=false WHERE username != ?;", username, (err, result) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  // db.query("UPDATE users SET loginIn=false WHERE username != ?;", username, (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });
 });
 
 app.post("/logout", (req, res) => {

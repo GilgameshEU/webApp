@@ -3,19 +3,45 @@ const router = express.Router();
 const db = require("../config/database");
 const urlencodedParser = express.urlencoded({ extended: false });
 
+// router.get("/user-list", function (req, res, next) {
+//   const sql = "SELECT * FROM users WHERE loginIn = true LIMIT 1";
+//   db.query(sql, function (err, data, fields) {
+//     if (err) throw err;
+//     if (data.length > 0) {
+//       if (data[0].status === 1) {
+//         res.render("error", { title: "Error", message: "You do not have permission to view this page" });
+//       } else {
+//         const sql = "SELECT * FROM users";
+//         db.query(sql, function (err, data, fields) {
+//           if (err) throw err;
+//           res.render("user-list", { title: "User List", userData: data });
+//         });
+//       }
+//     } else {
+//       res.render("error", { title: "Error", message: "No logged in user found" });
+//     }
+//   });
+// });
+
 router.get("/user-list", function (req, res, next) {
-  const sql = "SELECT * FROM users WHERE loginIn = true LIMIT 1";
+  const sql = "SELECT * FROM users WHERE loginIn = true";
   db.query(sql, function (err, data, fields) {
     if (err) throw err;
     if (data.length > 0) {
-      if (data[0].status === 1) {
-        res.render("error", { title: "Error", message: "You do not have permission to view this page" });
-      } else {
+      let hasPermission = true;
+      data.forEach((user) => {
+        if (user.status === 1) {
+          hasPermission = false;
+        }
+      });
+      if (hasPermission) {
         const sql = "SELECT * FROM users";
         db.query(sql, function (err, data, fields) {
           if (err) throw err;
           res.render("user-list", { title: "User List", userData: data });
         });
+      } else {
+        res.render("error", { title: "Error", message: "You do not have permission to view this page" });
       }
     } else {
       res.render("error", { title: "Error", message: "No logged in user found" });
